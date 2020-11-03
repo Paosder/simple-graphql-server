@@ -1,17 +1,8 @@
-import { ApolloServer, gql } from 'apollo-server';
+import { ApolloServer, AuthenticationError, gql } from 'apollo-server';
 import { environment } from './env';
 import { Resolvers, User } from './generated/graphql';
+import typeDefs from './typedefs';
 
-const typeDefs = gql`
-  type User {
-    id: ID!
-    name: String!
-  }
-
-  type Query {
-    getUser(name: String!): [User]
-  }
-`;
 
 const users: Array<User> = [
   {
@@ -20,6 +11,12 @@ const users: Array<User> = [
   }, {
     id: '2',
     name: 'Lucas'
+  }, {
+    id: '3',
+    name: 'Carson'
+  }, {
+    id: '4',
+    name: 'TEST'
   }
 ];
 
@@ -42,6 +39,16 @@ const server = new ApolloServer({
   introspection: environment.apollo.introspection,
   playground: environment.apollo.playground,
   resolvers,
+  context: ({req, connection}) => {
+    // req : HTTP Request, connection: WS Request.
+    const user = req ? req.headers.authorization : connection?.context.authorization;
+    if (!user) {
+      throw new AuthenticationError('no user id reserved.');
+    }
+    return {
+      user,
+    };
+  }
 });
 
 server.listen(environment.port).then(

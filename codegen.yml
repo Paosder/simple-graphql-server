@@ -1,5 +1,8 @@
 overwrite: true
-schema: "http://localhost:4000"
+schema:
+  - http://localhost:4000:
+      headers:
+        Authorization: 'Bearer Devtest'
 documents: null
 generates:
   src/generated/graphql.ts:
@@ -7,4 +10,5 @@ generates:
       - "typescript"
       - "typescript-resolvers"
     config:
+      contextType: ../types#Context
       useIndexSignature: true

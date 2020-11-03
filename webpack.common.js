@@ -7,7 +7,10 @@ module.exports = {
     filename: 'server.js',
   },
   resolve: {
-    extensions: ['.ts', '.js']
+    extensions: ['.ts', '.js'],
+    alias: {
+      "@data": path.resolve(__dirname, 'src/data/'),
+    },
   },
   module: {
     rules: [
