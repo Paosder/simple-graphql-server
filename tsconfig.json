@@ -67,7 +67,9 @@
     "forceConsistentCasingInFileNames": true  /* Disallow inconsistently-cased references to the same file. */,
     "baseUrl": "./",
     "paths": {
-      "@data": ["src/data"]
+      "@data": ["src/data"],
+      "@db": ["src/db"],
+      "@generated/*": ["src/generated/*"],
     }
   }
 }

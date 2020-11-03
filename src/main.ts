@@ -1,38 +1,12 @@
 import { ApolloServer, AuthenticationError, gql } from 'apollo-server';
 import { environment } from './env';
-import { Resolvers, User } from './generated/graphql';
 import typeDefs from './typedefs';
+import resolvers from './resolvers';
+import { redisClient } from './db';
 
 
-const users: Array<User> = [
-  {
-    id: '1',
-    name: 'Jaden'
-  }, {
-    id: '2',
-    name: 'Lucas'
-  }, {
-    id: '3',
-    name: 'Carson'
-  }, {
-    id: '4',
-    name: 'TEST'
-  }
-];
 
-const resolvers: Resolvers = {
-  Query: {
-    getUser: (_, { name }) => {
-      const result = users.reduce<Array<User>>((acc, el) => {
-        if (el.name === name) {
-          acc.push(el);
-        }
-        return acc;
-      }, []);
-      return result;
-    }
-  }
-}
+
 
 const server = new ApolloServer({
   typeDefs,
