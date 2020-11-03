@@ -10,6 +10,8 @@ module.exports = {
     extensions: ['.ts', '.js'],
     alias: {
       "@data": path.resolve(__dirname, 'src/data/'),
+      "@db": path.resolve(__dirname, "src/db/"),
+      "@generated": path.resolve(__dirname, "src/generated"),
     },
   },
   module: {
