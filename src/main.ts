@@ -2,11 +2,11 @@ import { ApolloServer, AuthenticationError, gql } from 'apollo-server';
 import { environment } from './env';
 import typeDefs from './typedefs';
 import resolvers from './resolvers';
-import { redisClient } from './db';
 
-
-
-
+interface ConnectionParams {
+  userid: string;
+  roomid: string;
+}
 
 const server = new ApolloServer({
   typeDefs,
@@ -15,17 +15,38 @@ const server = new ApolloServer({
   resolvers,
   context: ({req, connection}) => {
     // req : HTTP Request, connection: WS Request.
-    const user = req ? req.headers.authorization : connection?.context.authorization;
+    // ! DO NOT USE USER LIKE BELOW IN PRODUCTION. THIS IS JUST SAMPLE.
+    const user = req ? req.headers.userid : connection?.context.userid;
+    const roomId = req ? req.headers.roomid : connection?.context.roomid;
     if (!user) {
       throw new AuthenticationError('no user id reserved.');
     }
+
+    if (!roomId) {
+      throw new AuthenticationError('no room id reserved.');
+    }
     return {
       user,
+      roomId,
     };
+  },
+  subscriptions: {
+    onConnect: (connectionParams: any) => {
+      const params = connectionParams as ConnectionParams;
+      if (params.userid && params.roomid) {
+        const user = params.userid;
+        console.log(`[room-${params.roomid}] connected: ${user}`);
+      }
+      return connectionParams;
+    },
+    onDisconnect: async (_, context) => {
+      const params = await context.initPromise as ConnectionParams;
+      console.log(`[room-${params.roomid}] disconnected: ${params.userid}`);
+    }
   }
 });
 
-server.listen(environment.port).then(
+server.listen(environment.port, environment.binding).then(
   ({ url, subscriptionsUrl}) => {
   console.log(`server Listening at ${url}`);
   console.log(`Subscription Listening at ${subscriptionsUrl}`);

@@ -7,7 +7,7 @@ const typeDefs = gql`
   }
 
   type Query {
-    getUser(name: String): [User]
+    getUser(id: String!): User
   }
 `;
 

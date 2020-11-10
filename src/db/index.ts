@@ -1,20 +1,24 @@
 import { User } from '@generated/graphql';
-import redis from 'redis';
+import { RedisPubSub } from 'graphql-redis-subscriptions';
+import Redis from 'ioredis';
 
-export const redisClient = redis.createClient();
+const redisOptions: Redis.RedisOptions = {
+  retryStrategy: (options) => {
+    return Math.min(options * 100, 3000);
+  },
+}
 
-export const users: Array<User> = [
-  {
-    id: '1',
-    name: 'Jaden'
-  }, {
-    id: '2',
-    name: 'Lucas'
-  }, {
-    id: '3',
-    name: 'Carson'
-  }, {
-    id: '4',
-    name: 'TEST'
-  }
-];
+
+export const pubsub = new RedisPubSub({
+  publisher: new Redis(undefined, undefined, redisOptions),
+  subscriber: new Redis(undefined, undefined, redisOptions),
+});
+
+export const redisClient = new Redis(redisOptions);
+
+export const NEW_MESSAGE = 'NEW_MESSAGE' as const;
+
+redisClient.hset('user:1', 'name', 'Jaden');
+redisClient.hset('user:2', 'name', 'Lucas');
+redisClient.hset('user:3', 'name', 'Carson');
+redisClient.hset('user:4', 'name', 'Ted');
